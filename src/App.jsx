@@ -1,139 +1,196 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Link, Navigate, useNavigate, useLocation, useParams } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Link, useParams, Navigate, useLocation, useNavigate } from "react-router-dom";
 
 
 
-// ---------------------------------------------
-// Theme
-// ---------------------------------------------
-const COLORS = {
-  cibcRed: "#B90E31",
-  cibcGold: "#F4C542",
-  ink: "#0F172A",
+import stripeLogo from "./assets/stripe.png";
+import upsLogo from "./assets/ups.svg";
+import fedexLogo from "./assets/fedex.png";
+
+const LOGOS = {
+  stripe: stripeLogo,
+  ups: upsLogo,
+  fedex: fedexLogo,
 };
 
-// ---------------------------------------------
-// Employees (restricted team)
-// ---------------------------------------------
-const EMPLOYEES = [
-  { id: "e02", name: "Muhammad Mustafa", title: "Machine Learning Engineer", email: "m.mustafa@cibc.com" },
-  { id: "e07", name: "Sara Khan", title: "Machine Learning Lead", email: "sara.khan@cibc.com" },
-  { id: "e06", name: "Ian Greene", title: "Finance Manager", email: "ian.greene@cibc.com" },
+
+
+const partnerDeals = [
+  { brand: "H&M", discount: "10%", url: "https://www2.hm.com" },
+  { brand: "Steve Madden", discount: "15%", url: "https://www.stevemadden.com" },
+  { brand: "Gap", discount: "20%", url: "https://www.gap.com" },
+  { brand: "Foot Locker", discount: "15%", url: "https://www.footlocker.com" },
+  { brand: "Adidas", discount: "30%", url: "https://www.adidas.com" },
+  { brand: "Ardene", discount: "10%", url: "https://www.ardene.com" },
+  { brand: "Aldo", discount: "15%", url: "https://www.aldoshoes.com" },
+  { brand: "JD", discount: "10%", url: "https://www.jdsports.com" },
+  { brand: "Levi's", discount: "15%", url: "https://www.levi.com" },
+  { brand: "UGG", discount: "10%", url: "https://www.ugg.com" },
+  { brand: "Ray-Ban", discount: "25%", url: "https://www.ray-ban.com" },
+  { brand: "Crocs", discount: "$20 off", url: "https://www.crocs.com" },
+  { brand: "Lids", discount: "15%", url: "https://www.lids.com" },
+  { brand: "Moose Knuckles", discount: "$100 off", url: "https://www.mooseknucklescanada.com" },
+  { brand: "Samsung", discount: "10%", url: "https://www.samsung.com/ca" },
+  { brand: "Lenovo", discount: "Up to 60% off", url: "https://www.lenovo.com/ca/en" },
+  { brand: "Bath & Body Works", discount: "10%", url: "https://www.bathandbodyworks.com" },
+  { brand: "YSL", discount: "10%", url: "https://www.ysl.com" },
+  { brand: "Under Armour", discount: "20%", url: "https://www.underarmour.ca" },
+  { brand: "HP", discount: "$100 off", url: "https://www.hp.com/ca-en" },
+  { brand: "Shark", discount: "15%", url: "https://www.sharkclean.ca" },
+  { brand: "Swarovski", discount: "15%", url: "https://www.swarovski.com" },
+  { brand: "e.l.f. Cosmetics", discount: "25%", url: "https://www.elfcosmetics.com" },
+  { brand: "RW&CO", discount: "25%", url: "https://www.rw-co.com" },
 ];
 
-// ---------------------------------------------
-// Seed messages with requested dates
-// ---------------------------------------------
-function seedMessages() {
-  // Fixed absolute dates for grading clarity (local TZ will render nicely)
-  const iso = (y, m, d, hh = 9, mm = 0) => new Date(Date.UTC(y, m - 1, d, hh, mm, 0)).toISOString();
-  return [
-    {
-      id: "m001",
-      fromId: "e07",
-      toIds: ["e02"],
-      subject: "Model deployment readiness",
-      body: "Hey Muhammad — the fraud detection model v1.8 passed staging checks (AUC 0.941). Please review the feature store schema and confirm a rollout window for 22:00–23:00 ET.",
-      dateISO: iso(2025, 8, 22, 14, 10), // Aug 22, 2025 (older than Sept 11)
-      readBy: ["e07"],
-      starred: false,
-      labels: ["ML/Engineering"],
-    },
-    {
-      id: "m002",
-      fromId: "e07",
-      toIds: ["e02"],
-      subject: "Sprint planning: ML Ops",
-      body: "Backlog draft: retrain on Q3 data, enable drift monitor alerts, move batch scoring to hourly for cards portfolio.",
-      dateISO: iso(2025, 9, 5, 16, 35), // Sept 5, 2025 (older than Sept 11)
-      readBy: ["e07"],
-      starred: true,
-      labels: ["Planning"],
-    },
-    {
-      id: "m003",
-      fromId: "e06",
-      toIds: ["e02"],
-      subject: "Salary disbursement confirmation",
-      body: "Hi Muhammad, following up on your note about banking delays: Finance has prepared a bank draft for the remaining pay. I can confirm that it will be signed and ready for pickup by Tuesday, November 4, 2025. Please bring photo ID to Treasury at 9th floor reception.",
-      dateISO: iso(2025, 10, 31, 11, 20), // Oct 30, 2025
-      readBy: ["e06"],
-      starred: false,
-      labels: ["Finance"],
-    },
-  ];
+const initialProducts = [
+  { id: "prod_ugg_bailey_bow", name: "UGG Women's Mini Bailey Bow II (Beige Blush)", price: 205.04, url: "https://www.littleburgundyshoes.com/product/ugg-womens-mini-bailey-bow-ii-in-beige-blush-32750185" },
+  { id: "prod_marc_large_tote", name: "Marc Jacobs - The Large Tote Bag (Black)", price: 161.77, url: "https://www.marcjacobs.com/ca-en/the-large-tote-bag/M0016156.html" },
+  { id: "prod_lulu_define_jacket", name: "Lululemon Define Jacket Nulu - Goodnight Plum", price: 132.54, url: "https://shop.lululemon.com/en-ca/p/jackets-and-hoodies-jackets/Define-Jacket-Nulu/_/prod11020769" },
+  { id: "prod_bb_watch_x", name: "Apple Watch Series X (GPS, 45mm)", price: 599.99, url: "https://www.bestbuy.ca/en-ca" },
+  { id: "prod_lenovo_ideapad_pro", name: "Lenovo IdeaPad Pro 16", price: 1299.99, url: "https://www.lenovo.com/ca/en" },
+];
+
+const sampleOrders = [
+  {
+    orderId: "ord_lb_20251016",
+    merchant: "Little Burgundy Shoes",
+    date: "2025-10-16",
+    time: "01:22",
+    expectedDelivery: "2025-11-04",
+    destination: "Markham, ON, Canada",
+    total: initialProducts[0].price,
+    items: [{ ...initialProducts[0], qty: 1 }],
+    trackingEvents: [
+      { carrier: "FedEx", trackingNumber: "612345678901", status: "Shipment information sent to FedEx", location: "Montreal, QC", time: "2025-10-16 02:05" },
+      { carrier: "FedEx", trackingNumber: "612345678901", status: "Label created", location: "Montreal, QC", time: "2025-10-16 01:58" },
+    ],
+  },
+  {
+    orderId: "ord_mj_20251016",
+    merchant: "Marc Jacobs",
+    date: "2025-10-16",
+    time: "01:47",
+    expectedDelivery: "2025-11-05",
+    destination: "Markham, ON, Canada",
+    total: initialProducts[1].price,
+    items: [{ ...initialProducts[1], qty: 1 }],
+    trackingEvents: [
+      { carrier: "UPS", trackingNumber: "1Z999AA10123456784", status: "Origin Scan", location: "Secaucus, NJ, US", time: "2025-10-24 09:01" },
+      { carrier: "UPS", trackingNumber: "1Z999AA10123456784", status: "Departed UPS Facility", location: "Buffalo, NY, US", time: "2025-10-27 22:12" },
+      { carrier: "UPS", trackingNumber: "1Z999AA10123456784", status: "In transit", location: "Louisville, KY, US", time: "2025-10-28 16:35" },
+      { carrier: "UPS", trackingNumber: "1Z999AA10123456784", status: "Import scan", location: "Mississauga, ON, CA", time: "2025-10-29 09:17" },
+      { carrier: "UPS", trackingNumber: "1Z999AA10123456784", status: "Arrived at UPS Facility", location: "Mississauga, ON, CA", time: "2025-10-29 13:24" }
+    ],
+  },
+  {
+    orderId: "ord_lulu_20251016",
+    merchant: "Lululemon",
+    date: "2025-10-16",
+    time: "02:31",
+    expectedDelivery: "2025-10-31",
+    destination: "Markham, ON, Canada",
+    total: initialProducts[2].price,
+    items: [{ ...initialProducts[2], qty: 1 }],
+    trackingEvents: [
+      { carrier: "FedEx", trackingNumber: "784512369000", status: "Picked up", location: "Vancouver, BC", time: "2025-10-21 15:05" },
+      { carrier: "FedEx", trackingNumber: "784512369000", status: "Left FedEx origin facility", location: "Delta, BC", time: "2025-10-21 22:10" },
+      { carrier: "FedEx", trackingNumber: "784512369000", status: "Arrived at FedEx location", location: "Mississauga, ON", time: "2025-10-22 05:50" },
+      { carrier: "FedEx", trackingNumber: "784512369000", status: "Departed FedEx location", location: "Mississauga, ON", time: "2025-10-22 20:15" },
+      { carrier: "FedEx", trackingNumber: "784512369000", status: "At local FedEx facility", location: "Whitby, ON", time: "2025-10-23 05:09" },
+      { carrier: "FedEx", trackingNumber: "784512369000", status: "On FedEx vehicle for delivery", location: "Whitby, ON", time: "2025-10-23 05:13" },
+      { carrier: "FedEx", trackingNumber: "784512369000", status: "Delivery exception", location: "Markham, ON", time: "2025-10-23 09:36" },
+      { carrier: "FedEx", trackingNumber: "784512369000", status: "Shipment arriving On-Time", location: "Whitby, ON", time: "2025-10-23 23:49" },
+      { carrier: "FedEx", trackingNumber: "784512369000", status: "At local FedEx facility", location: "Whitby, ON", time: "2025-10-31 08:12" },
+    ],
+  },
+  {
+    orderId: "ord_bb_20251012",
+    merchant: "Best Buy",
+    date: "2025-10-12",
+    time: "14:18",
+    expectedDelivery: "2025-11-03",
+    destination: "Markham, ON, Canada",
+    total: initialProducts[3].price,
+    items: [{ ...initialProducts[3], qty: 1 }],
+    trackingEvents: [
+      { carrier: "UPS", trackingNumber: "1Z3F0BB10123456789", status: "Origin Scan", location: "Brampton, ON, CA", time: "2025-10-17 18:22" },
+      { carrier: "UPS", trackingNumber: "1Z3F0BB10123456789", status: "Departed UPS Facility", location: "Brampton, ON, CA", time: "2025-10-20 02:10" },
+      { carrier: "UPS", trackingNumber: "1Z3F0BB10123456789", status: "Arrived at UPS Facility", location: "Mississauga, ON, CA", time: "2025-10-21 06:40" },
+      { carrier: "UPS", trackingNumber: "1Z3F0BB10123456789", status: "In transit", location: "Concord, ON, CA", time: "2025-10-27 11:05" },
+    ],
+  },
+  {
+    orderId: "ord_len_20251027",
+    merchant: "Lenovo",
+    date: "2025-10-27",
+    time: "10:03",
+    expectedDelivery: "2025-11-07",
+    destination: "Markham, ON, Canada",
+    total: initialProducts[4].price,
+    items: [{ ...initialProducts[4], qty: 1 }],
+    trackingEvents: [
+      { carrier: "FedEx", trackingNumber: "6123LENOVO789012", status: "Picked up", location: "Whitsett, NC, US", time: "2025-10-27 12:04" },
+      { carrier: "FedEx", trackingNumber: "6123LENOVO789012", status: "Arrived at FedEx location", location: "Memphis, TN, US", time: "2025-10-29 03:44" },
+      { carrier: "FedEx", trackingNumber: "6123LENOVO789012", status: "Departed FedEx location", location: "Memphis, TN, US", time: "2025-10-29 06:21" },
+      { carrier: "FedEx", trackingNumber: "6123LENOVO789012", status: "In transit", location: "Mississauga, ON, CA", time: "2025-10-31 09:57" },
+    ],
+  },
+];
+
+const USERS_LIST = ["Adam Sarwar", "Muhammad Mustafa", "Shahid Sarwar", "Affan Naushad"];
+
+function validateCredentials(u, p) {
+  return u === "asmmaffan" && p === "packages";
 }
 
-// ---------------------------------------------
-// Auth state (sessionStorage)
-// ---------------------------------------------
-function useAuth() {
+function useAuthState() {
   const [auth, setAuth] = useState(() => {
     try {
-      const raw = sessionStorage.getItem("cibc_portal_auth");
-      return raw ? JSON.parse(raw) : { loggedIn: false, userId: null };
-    } catch { return { loggedIn: false, userId: null }; }
+      const raw = sessionStorage.getItem("stripeConsumersAuth");
+      return raw ? JSON.parse(raw) : { loggedIn: false, user: null };
+    } catch {
+      return { loggedIn: false, user: null };
+    }
   });
-  useEffect(() => sessionStorage.setItem("cibc_portal_auth", JSON.stringify(auth)), [auth]);
+  useEffect(() => {
+    sessionStorage.setItem("stripeConsumersAuth", JSON.stringify(auth));
+  }, [auth]);
   return [auth, setAuth];
 }
 
-function validate(u, p) {
-  return (u === "asmmaffan" && p === "packages") || (u === "manager" && p === "cibc2025");
-}
-
-// ---------------------------------------------
-// Messages state (sessionStorage)
-// ---------------------------------------------
-function useMessages() {
-  const [msgs, setMsgs] = useState(() => {
-    try {
-      const raw = sessionStorage.getItem("cibc_portal_msgs");
-      if (raw) return JSON.parse(raw);
-      const seeded = seedMessages();
-      sessionStorage.setItem("cibc_portal_msgs", JSON.stringify(seeded));
-      return seeded;
-    } catch { return seedMessages(); }
-  });
-  useEffect(() => sessionStorage.setItem("cibc_portal_msgs", JSON.stringify(msgs)), [msgs]);
-  return [msgs, setMsgs];
-}
-
-// ---------------------------------------------
-// Utils
-// ---------------------------------------------
-function getEmp(id) { return EMPLOYEES.find((e) => e.id === id); }
-function fmtDate(isoStr) {
-  const d = new Date(isoStr);
-  return d.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
-}
-
-// ---------------------------------------------
-// Header & Footer (restored design)
-// ---------------------------------------------
-function Header() {
-  const [auth, setAuth] = useAuth();
-  const navigate = useNavigate();
+function RequireAuth({ children }) {
+  const [auth] = useAuthState();
   const location = useLocation();
+  if (!auth.loggedIn) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+  return <>{children}</>;
+}
+
+function Header() {
+  const location = useLocation();
+  const [auth, setAuth] = useAuthState();
+  const navigate = useNavigate();
+  const onLogout = () => {
+    setAuth({ loggedIn: false, user: null });
+    navigate("/login");
+  };
   const isLogin = location.pathname === "/login";
   return (
-    <header className="sticky top-0 z-40 border-b" style={{ background: COLORS.cibcRed, borderColor: "#8f0b26" }}>
-      <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+    <header className="sticky top-0 z-50 bg-white shadow-sm border-b">
+      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <Link to={auth.loggedIn ? "/" : "/login"} className="flex items-center gap-3">
-          <div className="flex items-center justify-center h-8 w-8 rounded bg-white">
-            <span className="text-[10px] font-bold" style={{ color: COLORS.cibcRed }}>CIBC</span>
-          </div>
-          <div className="text-white font-semibold tracking-tight">Employee Portal</div>
+          <img src={LOGOS.stripe} alt="Stripe" className="h-6" />
+          <span className="font-semibold tracking-tight text-slate-800">Consumers</span>
         </Link>
         {!isLogin && (
-          <nav className="flex items-center gap-1 text-sm">
-            <Link to="/" className="px-3 py-1 rounded text-white/90 hover:text-white">Dashboard</Link>
-            <Link to="/inbox" className="px-3 py-1 rounded text-white/90 hover:text-white">Inbox</Link>
-            <Link to="/compose" className="px-3 py-1 rounded text-white/90 hover:text-white">Compose</Link>
-            <Link to="/directory" className="px-3 py-1 rounded text-white/90 hover:text-white">Directory</Link>
-            {auth.loggedIn && (
-              <button onClick={() => { setAuth({ loggedIn: false, userId: null }); navigate("/login"); }} className="ml-2 px-3 py-1 rounded bg-white/10 text-white hover:bg-white/20">Sign out</button>
-            )}
+          <nav className="flex items-center gap-3 text-sm">
+            <Link to="/" className="px-3 py-1 rounded hover:bg-slate-100">Home</Link>
+            <Link to="/orders" className="px-3 py-1 rounded hover:bg-slate-100">Orders</Link>
+            <Link to="/merchants" className="px-3 py-1 rounded bg-slate-100 border">Merchants</Link>
+            {auth.loggedIn ? (
+              <button onClick={onLogout} className="ml-2 px-3 py-1 rounded border">Sign out</button>
+            ) : null}
           </nav>
         )}
       </div>
@@ -143,375 +200,322 @@ function Header() {
 
 function Footer() {
   return (
-    <footer className="mt-12 border-t bg-white text-slate-700">
+    <footer className="bg-white text-slate-700 mt-12 border-t">
       <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-4 gap-8 text-sm">
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <div className="h-8 w-8 rounded bg-[#B90E31] grid place-items-center"><span className="text-[10px] font-bold text-white">CIBC</span></div>
-            <span className="font-semibold">Employee Portal</span>
+            <img src={LOGOS.stripe} alt="Stripe" className="h-6" />
+            <span className="font-semibold">Consumers</span>
           </div>
-          <p className="text-slate-500">Internal Portal. Do not connect to online systems!</p>
+          <p className="text-slate-500">Consolidated order management and partner integrations</p>
+        </div>
+        <div>
+          <div className="font-semibold mb-2">Products</div>
+          <ul className="space-y-1 text-slate-500">
+            <li><Link to="/orders" className="hover:text-slate-800">Orders</Link></li>
+            <li><Link to="/orders" className="hover:text-slate-800">Tracking</Link></li>
+            <li><Link to="/merchants" className="hover:text-slate-800">Merchant Hub</Link></li>
+          </ul>
+        </div>
+        <div>
+          <div className="font-semibold mb-2">Developers</div>
+          <ul className="space-y-1 text-slate-500">
+            <li><a href="https://docs.stripe.com" target="_blank" rel="noreferrer" className="hover:text-slate-800">Docs</a></li>
+            <li><a href="https://status.stripe.com" target="_blank" rel="noreferrer" className="hover:text-slate-800">API status</a></li>
+            <li><a href="https://docs.stripe.com/changelog" target="_blank" rel="noreferrer" className="hover:text-slate-800">Changelog</a></li>
+          </ul>
         </div>
         <div>
           <div className="font-semibold mb-2">Company</div>
           <ul className="space-y-1 text-slate-500">
-            <li><a className="hover:text-slate-900" target="_blank" rel="noreferrer" href="https://www.cibc.com/en/about-cibc.html">About CIBC</a></li>
-            <li><a className="hover:text-slate-900" target="_blank" rel="noreferrer" href="https://www.cibc.com/en/careers.html">Careers</a></li>
-            <li><a className="hover:text-slate-900" target="_blank" rel="noreferrer" href="https://www.cibc.com/en/contact-us.html">Contact</a></li>
-          </ul>
-        </div>
-        <div>
-          <div className="font-semibold mb-2">Security & Legal</div>
-          <ul className="space-y-1 text-slate-500">
-            <li><a className="hover:text-slate-900" target="_blank" rel="noreferrer" href="https://www.cibc.com/en/privacy-security/privacy-policy.html">Privacy</a></li>
-            <li><a className="hover:text-slate-900" target="_blank" rel="noreferrer" href="https://www.cibc.com/en/privacy-security/overview.html">Security</a></li>
-            <li><a className="hover:text-slate-900" target="_blank" rel="noreferrer" href="https://www.cibc.com/en/legal/legal.html">Legal</a></li>
-            <li><a className="hover:text-slate-900" target="_blank" rel="noreferrer" href="https://www.cibc.com/en/accessibility/accessibility-plan.html">Accessibility</a></li>
-          </ul>
-        </div>
-        <div>
-          <div className="font-semibold mb-2">Help</div>
-          <ul className="space-y-1 text-slate-500">
-            <li><a className="hover:text-slate-900" target="_blank" rel="noreferrer" href="https://www.cibc.com/">cibc.com</a></li>
-            <li><a className="hover:text-slate-900" target="_blank" rel="noreferrer" href="https://www.cibc.com/en/privacy-security/report-fraud.html">Report Fraud</a></li>
+            <li><a href="https://stripe.com/about" target="_blank" rel="noreferrer" className="hover:text-slate-800">About</a></li>
+            <li><a href="https://support.stripe.com/" target="_blank" rel="noreferrer" className="hover:text-slate-800">Contact</a></li>
+            <li><a href="https://stripe.com/legal" target="_blank" rel="noreferrer" className="hover:text-slate-800">Legal</a></li>
           </ul>
         </div>
       </div>
       <div className="border-t">
         <div className="max-w-7xl mx-auto px-6 py-4 text-xs text-slate-500 flex items-center justify-between">
-          <span>© {new Date().getFullYear()} CIBC</span>
-          <span>Built with React</span>
+          <span>© {new Date().getFullYear()}Consumers</span>
+          <span>Stripe 2025</span>
         </div>
       </div>
     </footer>
   );
 }
 
-// ---------------------------------------------
-// Auth guard
-// ---------------------------------------------
-function RequireAuth({ children }) {
-  const [auth] = useAuth();
-  const location = useLocation();
-  if (!auth.loggedIn) return <Navigate to="/login" state={{ from: location }} replace />;
-  return children;
-}
-
-// ---------------------------------------------
-// Login
-// ---------------------------------------------
 function Login() {
+  const [, setAuth] = useAuthState();
   const [u, setU] = useState("");
   const [p, setP] = useState("");
-  const [err, setErr] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [auth, setAuth] = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = (location.state && location.state.from && location.state.from.pathname) || "/";
 
   const doLogin = async () => {
-    setErr("");
+    setError("");
     setLoading(true);
-    const ok = validate(u.trim(), p.trim());
-    await new Promise((r) => setTimeout(r, 800));
+    const ok = validateCredentials(u.trim(), p.trim());
+    await new Promise((r) => setTimeout(r, 1000));
     setLoading(false);
-    if (ok) { setAuth({ loggedIn: true, userId: "e02" }); navigate(from, { replace: true }); }
-    else setErr("Invalid credentials");
+    if (ok) {
+      setAuth({ loggedIn: true, user: u.trim() });
+      navigate(from, { replace: true });
+    } else {
+      setError("Invalid username or password");
+    }
+  };
+
+  const redirectToStripe = () => {
+    window.open("https://dashboard.stripe.com/login", "_blank", "noopener");
   };
 
   return (
-    <main className="min-h-[80vh] grid place-items-center bg-gradient-to-b from-slate-50 to-white px-6">
+    <main className="min-h-[80vh] grid place-items-center bg-slate-50 px-6">
       <div className="w-full max-w-md bg-white border rounded-2xl p-6 shadow-sm">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="h-8 w-8 rounded grid place-items-center" style={{ background: COLORS.cibcRed }}>
-            <span className="text-[10px] font-bold text-white">CIBC</span>
-          </div>
-          <div className="font-semibold">Employee Portal</div>
+        <div className="flex items-center gap-3 mb-4">
+          <img src={LOGOS.stripe} alt="Stripe" className="h-6" />
+          <div className="font-semibold text-slate-800">Consumers</div>
         </div>
         <h1 className="text-xl font-bold mb-1">Sign in</h1>
-        <p className="text-sm text-slate-600 mb-6">Use your credentials to continue.</p>
+        <p className="text-sm text-slate-600 mb-6">Sign in to access your orders, tracking, and merchant integrations.</p>
         <label className="text-sm">Username</label>
-        <input className="mt-1 w-full border rounded px-3 py-2 mb-4" placeholder="username" value={u} onChange={(e)=>setU(e.target.value)} />
+        <input value={u} onChange={(e)=>setU(e.target.value)} className="mt-1 w-full border rounded px-3 py-2 mb-4" placeholder="Enter username" />
         <label className="text-sm">Password</label>
-        <input className="mt-1 w-full border rounded px-3 py-2" placeholder="password" type="password" value={p} onChange={(e)=>setP(e.target.value)} />
-        {err && <div className="text-red-600 text-sm mt-2">{err}</div>}
-        <button disabled={loading} onClick={doLogin} className="mt-4 w-full" style={{ background: COLORS.cibcRed, color: "#fff" }}>
-          <div className="py-2 font-medium">{loading ? "Signing in…" : "Sign in"}</div>
+        <input value={p} onChange={(e)=>setP(e.target.value)} type="password" className="mt-1 w-full border rounded px-3 py-2" placeholder="Enter password" />
+        {error && <div className="text-red-600 text-sm mt-2">{error}</div>}
+        <button disabled={loading} onClick={doLogin} className="mt-4 w-full bg-slate-800 text-white py-2 rounded flex items-center justify-center">
+          {loading ? <span className="animate-pulse">Signing in...</span> : "Sign in"}
+        </button>
+        <div className="flex items-center gap-2 my-4 text-xs text-slate-500"><span className="h-px bg-slate-200 flex-1"/><span>or</span><span className="h-px bg-slate-200 flex-1"/></div>
+        <button disabled={loading} onClick={redirectToStripe} className="w-full border py-2 rounded hover:bg-slate-50 flex items-center justify-center gap-2">
+          <img src={LOGOS.stripe} alt="Stripe" className="h-4 w-auto object-contain" />
+          <span>Authentication</span>
         </button>
       </div>
     </main>
   );
 }
 
-// ---------------------------------------------
-// Dashboard
-// ---------------------------------------------
-function Dashboard() {
-  const [auth] = useAuth();
-  const [msgs] = useMessages();
-  const myId = auth.userId || "e02";
-  const myInbox = useMemo(() => msgs.filter((m) => m.toIds.includes(myId) || m.fromId === myId), [msgs, myId]);
-  const unread = myInbox.filter((m) => !m.readBy.includes(myId)).length;
-  const starred = myInbox.filter((m) => m.starred).length;
-
+function Home() {
+  const [auth] = useAuthState();
+  const totalSpend = useMemo(() => sampleOrders.reduce((s, o) => s + (o.total || 0), 0), []);
   return (
     <main className="max-w-7xl mx-auto px-6 py-10">
-      <div className="bg-white rounded-2xl border p-8 mb-8">
-        <h1 className="text-2xl font-semibold">Welcome {getEmp(myId)?.name || "Colleague"}</h1>
-        <p className="text-slate-600 mt-1">Your internal communications at a glance.</p>
-        <div className="mt-6 grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-          <StatCard label="Inbox items" value={myInbox.length} />
-          <StatCard label="Unread" value={unread} />
-          <StatCard label="Starred" value={starred} />
-        </div>
-        <div className="mt-6 flex gap-3">
-          <Link to="/inbox" className="px-4 py-2 rounded text-white" style={{ background: COLORS.cibcRed }}>Open Inbox</Link>
-          <Link to="/compose" className="px-4 py-2 rounded border">Compose</Link>
-          <Link to="/directory" className="px-4 py-2 rounded border">Directory</Link>
+      <div className="bg-white rounded-2xl p-8 mb-8 shadow-sm">
+        <div className="flex items-center justify-between gap-6 flex-wrap">
+          <div>
+            <h1 className="text-3xl font-semibold">Welcome{auth.user ? `, ${String(auth.user).split("@")[0]}` : ""}</h1>
+            <p className="text-slate-600 mt-2">Consumer Dashboard: Access merchant integrations and order management</p>
+          </div>
+          <div className="flex items-center gap-3 text-sm">
+            <div className="px-3 py-2 rounded-lg bg-slate-50">Users: <span className="font-semibold">{USERS_LIST.length}</span></div>
+            <div className="px-3 py-2 rounded-lg bg-slate-50">Orders: <span className="font-semibold">{sampleOrders.length}</span></div>
+            <div className="px-3 py-2 rounded-lg bg-slate-50">Total spend: <span className="font-semibold">${totalSpend.toFixed(2)}</span></div>
+          </div>
         </div>
       </div>
-      <RecentList />
+
+      <div className="grid lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-1 border rounded-xl p-6 bg-white">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold">Users</h3>
+            <span className="text-xs text-slate-500">{USERS_LIST.length} total</span>
+          </div>
+          <ul className="space-y-3">
+            {USERS_LIST.map((n) => (
+              <li key={n} className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="h-8 w-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500" />
+                  <span>{n}</span>
+                </div>
+                <span className="text-xs text-slate-500">Active</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="lg:col-span-2 grid md:grid-cols-2 gap-6">
+          <div className="p-6 border rounded-xl bg-white">
+            <h3 className="font-semibold mb-2">Consumers (Orders)</h3>
+            <p className="text-sm text-slate-600 mb-4">Manage Orders and Access Tracking Information</p>
+            <Link to="/orders" className="inline-block bg-indigo-600 text-white px-4 py-2 rounded">Go to Orders</Link>
+          </div>
+          <div className="p-6 border rounded-xl bg-white">
+            <h3 className="font-semibold mb-2">Merchants</h3>
+            <p className="text-sm text-slate-600 mb-4">Browse brand partners and jump to their sites</p>
+            <Link to="/merchants" className="inline-block bg-slate-700 text-white px-4 py-2 rounded">Go to Merchants</Link>
+          </div>
+        </div>
+      </div>
     </main>
   );
 }
 
-function StatCard({ label, value }) {
+function Orders({ orders }) {
   return (
-    <div className="p-4 border rounded-xl bg-slate-50">
-      <div className="text-slate-500 text-sm">{label}</div>
-      <div className="text-2xl font-semibold mt-1">{value}</div>
-    </div>
-  );
-}
-
-function RecentList() {
-  const [msgs] = useMessages();
-  const recent = [...msgs].sort((a,b)=>new Date(b.dateISO)-new Date(a.dateISO)).slice(0,6);
-  return (
-    <div className="border rounded-2xl bg-white">
-      <div className="px-6 py-4 border-b font-semibold">Recent messages</div>
-      <div className="divide-y">
-        {recent.map(m => (
-          <div key={m.id} className="px-6 py-3 flex items-center justify-between">
-            <div>
-              <div className="font-medium">{m.subject}</div>
-              <div className="text-xs text-slate-500">From {getEmp(m.fromId)?.name} · {fmtDate(m.dateISO)}</div>
-            </div>
-            <Link to={`/inbox/${m.id}`} className="text-sm text-indigo-600 underline">Open</Link>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ---------------------------------------------
-// Inbox & Thread
-// ---------------------------------------------
-function Inbox() {
-  const [msgs] = useMessages();
-  const [auth] = useAuth();
-  const myId = auth.userId || "e02";
-  const [q, setQ] = useState("");
-  const [showStar, setShowStar] = useState(false);
-
-  const list = useMemo(() => {
-    let x = msgs.filter((m) => m.toIds.includes(myId) || m.fromId === myId);
-    if (q.trim()) {
-      const t = q.trim().toLowerCase();
-      x = x.filter((m) => m.subject.toLowerCase().includes(t) || m.body.toLowerCase().includes(t));
-    }
-    if (showStar) x = x.filter((m) => m.starred);
-    return x.sort((a,b)=>new Date(b.dateISO)-new Date(a.dateISO));
-  }, [msgs, myId, q, showStar]);
-
-  return (
-    <main className="max-w-7xl mx-auto px-6 py-10">
-      <div className="mb-4 flex items-center gap-3">
-        <input className="border rounded px-3 py-2 w-full sm:w-80" placeholder="Search inbox" value={q} onChange={(e)=>setQ(e.target.value)} />
-        <label className="text-sm flex items-center gap-2"><input type="checkbox" checked={showStar} onChange={(e)=>setShowStar(e.target.checked)} /> Starred</label>
-        <Link to="/compose" className="px-4 py-2 rounded text-white" style={{ background: COLORS.cibcRed }}>Compose</Link>
-      </div>
-
-      <div className="border rounded-xl overflow-hidden bg-white">
-        <div className="grid grid-cols-12 px-4 py-2 bg-slate-50 text-xs text-slate-500">
-          <div className="col-span-5">Subject</div>
-          <div className="col-span-3">From</div>
-          <div className="col-span-3">To</div>
-          <div className="col-span-1 text-right pr-2">Star</div>
-        </div>
-        <div className="divide-y">
-          {list.map(m => (
-            <Link key={m.id} to={`/inbox/${m.id}`} className="grid grid-cols-12 px-4 py-3 hover:bg-slate-50">
-              <div className="col-span-5">
-                <div className={`font-medium ${m.readBy.includes(myId) ? "" : "text-slate-900"}`}>{m.subject}</div>
-                <div className="text-xs text-slate-500 truncate">{m.body}</div>
+    <main className="max-w-6xl mx-auto px-6 py-10">
+      <h1 className="text-2xl font-bold mb-4">Your Orders</h1>
+      {orders.length === 0 ? (
+        <div className="text-slate-600">No orders found.</div>
+      ) : (
+        <div className="space-y-4">
+          {orders.map((o) => (
+            <div key={o.orderId} className="p-4 border rounded-lg flex justify-between items-center">
+              <div>
+                <div className="font-semibold">{o.merchant} - <span className="text-sm text-slate-500">{o.orderId}</span></div>
+                <div className="text-sm text-slate-600">{o.date} {o.time ? `at ${o.time}` : ""} - {o.items.length} item(s) - ETA: {o.expectedDelivery || "-"}</div>
               </div>
-              <div className="col-span-3 text-sm">{getEmp(m.fromId)?.name}</div>
-              <div className="col-span-3 text-sm truncate">{m.toIds.map((id)=>getEmp(id)?.name).join(", ")}</div>
-              <div className="col-span-1 text-right pr-2">{m.starred ? "★" : "☆"}</div>
-            </Link>
+              <div className="flex items-center gap-4">
+                <div className="font-semibold">${o.total.toFixed(2)}</div>
+                <Link to={`/orders/${o.orderId}`} className="text-indigo-600 underline">View</Link>
+              </div>
+            </div>
           ))}
         </div>
-      </div>
+      )}
     </main>
   );
 }
 
-function Thread() {
+function maskTrackingNumber(tn) {
+  if (!tn) return "";
+  return tn.replace(/([0-9A-Z]{4})$/, "****");
+}
+
+function carrierLogo(carrier) {
+  if (!carrier) return null;
+  const key = carrier.toLowerCase().includes("ups") ? "ups" : carrier.toLowerCase().includes("fedex") ? "fedex" : null;
+  return key ? LOGOS[key] : null;
+}
+
+function OrderDetail({ orders }) {
   const { id } = useParams();
-  const [msgs, setMsgs] = useMessages();
-  const [auth] = useAuth();
-  const myId = auth.userId || "e02";
-  const navigate = useNavigate();
-  const m = msgs.find((x) => x.id === id);
-  useEffect(() => {
-    if (!m) return;
-    if (!m.readBy.includes(myId)) {
-      const next = msgs.map((x) => x.id === id ? { ...x, readBy: [...new Set([...x.readBy, myId])] } : x);
-      setMsgs(next);
-    }
-  }, [id]);
-  if (!m) return <main className="max-w-3xl mx-auto px-6 py-10">Message not found</main>;
+  const order = orders.find((o) => o.orderId === id);
+  const [showModal, setShowModal] = useState(false);
+  if (!order) return <div className="max-w-6xl mx-auto px-6 py-10">Order not found</div>;
+
+  const carrier = order.trackingEvents[0]?.carrier || "";
+  const tel = carrier.toLowerCase().includes("ups") ? "tel:+18007425877" : carrier.toLowerCase().includes("fedex") ? "tel:+18004633339" : "";
 
   return (
-    <main className="max-w-3xl mx-auto px-6 py-10">
-      <div className="mb-3 text-sm text-slate-500"><button className="underline" onClick={()=>navigate(-1)}>Back</button></div>
-      <div className="border rounded-2xl bg-white overflow-hidden">
-        <div className="px-6 py-4 border-b flex items-center justify-between">
-          <div>
-            <div className="font-semibold text-lg">{m.subject}</div>
-            <div className="text-xs text-slate-500">From {getEmp(m.fromId)?.name} · {fmtDate(m.dateISO)}</div>
-          </div>
-          <button onClick={()=>toggleStar(m.id, msgs, setMsgs)} className="text-xl">{m.starred ? "★" : "☆"}</button>
-        </div>
-        <div className="px-6 py-5 whitespace-pre-wrap text-slate-800">{m.body}</div>
-      </div>
-      <div className="mt-4 flex gap-2">
-        <Link to={`/compose?reply=${m.id}`} className="px-4 py-2 rounded text-white" style={{ background: COLORS.cibcRed }}>Reply</Link>
-        <Link to={`/compose?forward=${m.id}`} className="px-4 py-2 rounded border">Forward</Link>
-      </div>
-    </main>
-  );
-}
+    <main className="max-w-6xl mx-auto px-6 py-10">
+      <h1 className="text-2xl font-bold mb-2">Order {order.orderId}</h1>
+      <div className="text-sm text-slate-600 mb-2">Merchant: {order.merchant} - Date: {order.date}{order.time ? ` at ${order.time}` : ""}</div>
+      <div className="text-sm text-slate-600 mb-6">Expected delivery: {order.expectedDelivery || "-"}</div>
 
-function toggleStar(id, msgs, setMsgs) {
-  setMsgs(msgs.map((x)=> x.id === id ? { ...x, starred: !x.starred } : x));
-}
-
-// ---------------------------------------------
-// Compose
-// ---------------------------------------------
-function Compose() {
-  const [auth] = useAuth();
-  const myId = auth.userId || "e02";
-  const [msgs, setMsgs] = useMessages();
-  const params = new URLSearchParams(window.location.search);
-  const replyId = params.get("reply");
-  const forwardId = params.get("forward");
-  const replyMsg = msgs.find((m)=>m.id===replyId);
-  const forwardMsg = msgs.find((m)=>m.id===forwardId);
-
-  const [to, setTo] = useState(replyMsg ? getEmp(replyMsg.fromId)?.email : "");
-  const [subject, setSubject] = useState(
-    replyMsg ? `Re: ${replyMsg.subject}` : forwardMsg ? `Fwd: ${forwardMsg.subject}` : ""
-  );
-  const [body, setBody] = useState(forwardMsg ? (`\n\n—— Forwarded ——\nFrom: ${getEmp(forwardMsg.fromId)?.name}\nDate: ${fmtDate(forwardMsg.dateISO)}\n\n${forwardMsg.body}`) : "");
-
-  const navigate = useNavigate();
-
-  const submit = (e) => {
-    e.preventDefault();
-    const toIds = to.split(",").map((s)=>s.trim()).filter(Boolean).map((email)=>{
-      const emp = EMPLOYEES.find((e)=>e.email===email);
-      return emp ? emp.id : null;
-    }).filter(Boolean);
-    if (!toIds.length) return alert("Recipient not found in directory");
-    const newMsg = {
-      id: `m${String(Date.now())}`,
-      fromId: myId,
-      toIds,
-      subject: subject || "(no subject)",
-      body: body || "",
-      dateISO: new Date().toISOString(),
-      readBy: [myId],
-      starred: false,
-      labels: ["General"],
-    };
-    setMsgs([newMsg, ...msgs]);
-    navigate("/inbox");
-  };
-
-  return (
-    <main className="max-w-3xl mx-auto px-6 py-10">
-      <form onSubmit={submit} className="border rounded-2xl bg-white">
-        <div className="px-6 py-4 border-b font-semibold">Compose</div>
-        <div className="p-6 space-y-4">
-          <div>
-            <label className="text-sm text-slate-600">To</label>
-            <input className="mt-1 w-full border rounded px-3 py-2" placeholder="email(s), comma separated" value={to} onChange={(e)=>setTo(e.target.value)} />
-            <div className="text-[11px] text-slate-500 mt-1">Directory hint: {EMPLOYEES.map(e=>e.email).join(", ")}</div>
-          </div>
-          <div>
-            <label className="text-sm text-slate-600">Subject</label>
-            <input className="mt-1 w-full border rounded px-3 py-2" value={subject} onChange={(e)=>setSubject(e.target.value)} />
-          </div>
-          <div>
-            <label className="text-sm text-slate-600">Message</label>
-            <textarea rows={8} className="mt-1 w-full border rounded px-3 py-2" value={body} onChange={(e)=>setBody(e.target.value)} />
-          </div>
-          <div className="flex gap-3">
-            <button type="submit" className="px-4 py-2 rounded text-white" style={{ background: COLORS.cibcRed }}>Send</button>
-            <Link to="/inbox" className="px-4 py-2 rounded border">Cancel</Link>
-          </div>
-        </div>
-      </form>
-    </main>
-  );
-}
-
-// ---------------------------------------------
-// Directory
-// ---------------------------------------------
-function Directory() {
-  const [q, setQ] = useState("");
-  const list = useMemo(()=>{
-    const t = q.trim().toLowerCase();
-    return EMPLOYEES.filter(e=>!t || e.name.toLowerCase().includes(t) || e.title.toLowerCase().includes(t) || e.email.toLowerCase().includes(t));
-  }, [q]);
-
-  return (
-    <main className="max-w-5xl mx-auto px-6 py-10">
-      <div className="mb-4 flex items-center gap-3">
-        <input className="border rounded px-3 py-2 w-full sm:w-96" placeholder="Search people" value={q} onChange={(e)=>setQ(e.target.value)} />
-      </div>
-      <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {list.map(e => (
-          <div key={e.id} className="p-4 border rounded-xl bg-white">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full grid place-items-center text-white font-semibold" style={{ background: COLORS.cibcRed }}>{e.name.split(" ").map(s=>s[0]).slice(0,2).join("")}</div>
-              <div>
-                <div className="font-medium">{e.name}</div>
-                <div className="text-xs text-slate-500">{e.title}</div>
+      <div className="grid md:grid-cols-2 gap-6">
+        <div>
+          <h3 className="font-semibold mb-2">Items</h3>
+          <div className="space-y-3">
+            {order.items.map((it) => (
+              <div key={it.id} className="p-3 border rounded flex justify-between">
+                <div>
+                  <div className="font-medium"><a href={it.url} className="underline" target="_blank" rel="noreferrer">{it.name}</a></div>
+                  <div className="text-sm text-slate-500">Qty: 1 - SKU: {it.id}</div>
+                </div>
+                <div className="font-semibold">${(it.price).toFixed(2)}</div>
               </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <h3 className="font-semibold mb-2">Tracking</h3>
+          <div className="p-4 border border-slate-200 rounded-lg bg-slate-200 shadow-sm">
+            <div className="flex items-center gap-3 mb-3">
+              {carrierLogo(carrier) && <img src={carrierLogo(carrier)} alt={carrier} className="h-6" />}
+              <div className="text-sm text-slate-600">Carrier: {carrier}</div>
             </div>
-            <div className="mt-3 text-sm text-slate-600 break-all">{e.email}</div>
-            <div className="mt-3 flex gap-2">
-              <Link to={`/compose?to=${encodeURIComponent(e.email)}`} className="px-3 py-1 rounded text-white" style={{ background: COLORS.cibcRed }}>Message</Link>
-              <a href={`mailto:${e.email}`} className="px-3 py-1 rounded border">Email</a>
+            <div className="text-sm text-slate-600 mb-3">Tracking #: <span title="Contact customer support to view full tracking">{maskTrackingNumber(order.trackingEvents[0].trackingNumber)}</span></div>
+
+            <div className="space-y-2">
+              {order.trackingEvents.map((t, i) => (
+                <div key={i} className="p-2 bg-slate-50 rounded">
+                  <div className="text-sm font-medium">{t.status}</div>
+                  <div className="text-xs text-slate-500">{t.location} - {t.time}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-4 flex items-center gap-3">
+              <button onClick={() => setShowModal(true)} className="bg-slate-800 text-white text-sm px-3 py-2 rounded">View externally</button>
+              {tel ? (
+                <a className="text-sm px-3 py-2 border rounded flex items-center gap-2" href={tel}>
+                  {carrier.toLowerCase().includes("ups") ? <img src={LOGOS.ups} alt="UPS" className="h-4" /> : <img src={LOGOS.fedex} alt="FedEx" className="h-4" />} Contact {carrier}
+                </a>
+              ) : null}
+              <div className="text-xs text-slate-500">.</div>
             </div>
           </div>
-        ))}
+        </div>
       </div>
+
+      <div className="mt-6">
+        <Link to="/orders" className="underline">Back to Orders</Link>
+      </div>
+
+      {showModal ? (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50" onClick={() => setShowModal(false)}>
+          <div className="bg-white rounded-lg w-full max-w-3xl overflow-hidden border" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-5 py-3 border-b bg-slate-900 text-white">
+              <div className="flex items-center gap-2">
+                {carrierLogo(carrier) && <img src={carrierLogo(carrier)} alt={carrier} className="h-5" />}
+                <div className="font-semibold">{carrier} Tracking</div>
+              </div>
+              <button onClick={() => setShowModal(false)} className="text-sm px-2 py-1 border rounded">Close</button>
+            </div>
+            <div className="p-5">
+              <div className="text-xs mb-2">Destination: {order.destination || 'Markham, ON, Canada'}</div>
+              <div className="text-sm text-slate-600 mb-4">Tracking #: <span title="Contact customer support to view full tracking">{maskTrackingNumber(order.trackingEvents[0].trackingNumber)}</span></div>
+              <div className="border-l-2 ml-2" style={{borderColor: '#D9D9D9'}}>
+                {order.trackingEvents.map((t, i) => (
+                  <div key={i} className="pl-4 relative py-3">
+                    <div className="absolute -left-2 top-4 h-3 w-3 rounded-full bg-slate-400" />
+                    <div className="text-sm font-medium">{t.status}</div>
+                    <div className="text-xs text-slate-500">{t.location} - {t.time}</div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 text-xs text-slate-500"></div>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }
 
-// ---------------------------------------------
-// App Root
-// ---------------------------------------------
+function Merchants() {
+  return (
+    <main className="max-w-7xl mx-auto px-6 py-10">
+      <h1 className="text-2xl font-bold mb-2">Merchant Hub</h1>
+      <p className="text-slate-600 mb-6">Featured partner discounts & more</p>
+
+      <section>
+        <h2 className="text-lg font-semibold mb-3">Featured brand partners</h2>
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {partnerDeals.map((d) => (
+            <div key={d.brand} className="p-4 rounded-xl border border-slate-200 bg-white flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between">
+                  <div className="font-semibold">{d.brand}</div>
+                  <span className="text-xs bg-slate-800 text-white px-2 py-0.5 rounded-full">{d.discount}</span>
+                </div>
+              </div>
+              <a href={d.url} target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center justify-center px-3 py-2 rounded-md border border-slate-300 hover:bg-slate-50 text-sm">Go to site</a>
+            </div>
+          ))}
+        </div>
+      </section>
+    </main>
+  );
+}
+
 export default function App() {
+  const [auth] = useAuthState();
   return (
     <Router>
       <div className="min-h-screen flex flex-col bg-slate-50">
@@ -519,12 +523,11 @@ export default function App() {
         <div className="flex-1">
           <Routes>
             <Route path="/login" element={<Login />} />
-            <Route path="/" element={<RequireAuth><Dashboard /></RequireAuth>} />
-            <Route path="/inbox" element={<RequireAuth><Inbox /></RequireAuth>} />
-            <Route path="/inbox/:id" element={<RequireAuth><Thread /></RequireAuth>} />
-            <Route path="/compose" element={<RequireAuth><Compose /></RequireAuth>} />
-            <Route path="/directory" element={<RequireAuth><Directory /></RequireAuth>} />
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="/" element={<RequireAuth><Home /></RequireAuth>} />
+            <Route path="/orders" element={<RequireAuth><Orders orders={sampleOrders} /></RequireAuth>} />
+            <Route path="/orders/:id" element={<RequireAuth><OrderDetail orders={sampleOrders} /></RequireAuth>} />
+            <Route path="/merchants" element={<RequireAuth><Merchants /></RequireAuth>} />
+            <Route path="*" element={<Navigate to={auth.loggedIn ? "/" : "/login"} replace />} />
           </Routes>
         </div>
         <Footer />
@@ -533,17 +536,17 @@ export default function App() {
   );
 }
 
-// ---------------------------------------------
-// Runtime smoke tests (console)
-// ---------------------------------------------
-(function runTests(){
+function runDevTests() {
   try {
-    console.assert(EMPLOYEES.length === 3, "Expected exactly 3 team members");
-    console.assert(typeof validate === "function", "validate() missing");
-    console.assert(validate("asmmaffan","packages") === true, "Auth test #1 failed");
-    console.assert(validate("manager","cibc2025") === true, "Auth test #2 failed");
-    const seeded = seedMessages();
-    console.assert(seeded.every(m => m.dateISO), "Messages need dateISO");
-    console.log("CIBC portal restored UI — tests passed ✅");
-  } catch (e) { console.warn("Smoke tests warning:", e); }
-})();
+    console.assert(sampleOrders.length === 5, "Test 1 failed: should have 5 orders");
+    console.assert(validateCredentials("asmmaffan", "packages") === true, "Test 2 failed: credentials should validate");
+    console.log("Runtime checks OK");
+  } catch (e) {
+    console.warn(e);
+  }
+}
+
+try {
+  const isDev = (typeof import.meta !== "undefined" && import.meta && import.meta.env && import.meta.env.DEV) || (typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production");
+  if (isDev) runDevTests();
+} catch (_) {}
