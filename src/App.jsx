@@ -75,11 +75,11 @@ const sampleOrders = [
     total: initialProducts[1].price,
     items: [{ ...initialProducts[1], qty: 1 }],
     trackingEvents: [
-      { carrier: "UPS", trackingNumber: "1Z999AA10123456784", status: "In transit", location: "Louisville, KY, US", time: "2025-11-04 16:35" },
-      { carrier: "UPS", trackingNumber: "1Z999AA10123456784", status: "Departed UPS Facility", location: "Buffalo, NY, US", time: "2025-11-03 22:12" },
-      { carrier: "UPS", trackingNumber: "1Z999AA10123456784", status: "Arrived at UPS Facility", location: "Mississauga, ON, CA", time: "2025-11-03 13:24" },
-      { carrier: "UPS", trackingNumber: "1Z999AA10123456784", status: "Import scan", location: "Mississauga, ON, CA", time: "2025-11-03 09:17" },
-      { carrier: "UPS", trackingNumber: "1Z999AA10123456784", status: "Origin Scan", location: "Secaucus, NJ, US", time: "2025-11-02 09:01" },
+      { carrier: "UPS", trackingNumber: "1Z999AA10123456784", status: "Origin Scan", location: "Secaucus, NJ, US", time: "2025-10-24 09:01" },
+      { carrier: "UPS", trackingNumber: "1Z999AA10123456784", status: "Departed UPS Facility", location: "Buffalo, NY, US", time: "2025-10-27 22:12" },
+      { carrier: "UPS", trackingNumber: "1Z999AA10123456784", status: "In transit", location: "Louisville, KY, US", time: "2025-10-28 16:35" },
+      { carrier: "UPS", trackingNumber: "1Z999AA10123456784", status: "Import scan", location: "Mississauga, ON, CA", time: "2025-10-29 09:17" },
+      { carrier: "UPS", trackingNumber: "1Z999AA10123456784", status: "Arrived at UPS Facility", location: "Mississauga, ON, CA", time: "2025-10-29 13:24" }
     ],
   },
   {
@@ -113,10 +113,10 @@ const sampleOrders = [
     total: initialProducts[3].price,
     items: [{ ...initialProducts[3], qty: 1 }],
     trackingEvents: [
-      { carrier: "UPS", trackingNumber: "1Z3F0BB10123456789", status: "Origin Scan", location: "Brampton, ON, CA", time: "2025-10-31 18:22" },
-      { carrier: "UPS", trackingNumber: "1Z3F0BB10123456789", status: "Departed UPS Facility", location: "Brampton, ON, CA", time: "2025-11-01 02:10" },
-      { carrier: "UPS", trackingNumber: "1Z3F0BB10123456789", status: "Arrived at UPS Facility", location: "Mississauga, ON, CA", time: "2025-11-01 06:40" },
-      { carrier: "UPS", trackingNumber: "1Z3F0BB10123456789", status: "In transit", location: "Concord, ON, CA", time: "2025-11-02 11:05" },
+      { carrier: "UPS", trackingNumber: "1Z3F0BB10123456789", status: "Origin Scan", location: "Brampton, ON, CA", time: "2025-10-17 18:22" },
+      { carrier: "UPS", trackingNumber: "1Z3F0BB10123456789", status: "Departed UPS Facility", location: "Brampton, ON, CA", time: "2025-10-20 02:10" },
+      { carrier: "UPS", trackingNumber: "1Z3F0BB10123456789", status: "Arrived at UPS Facility", location: "Mississauga, ON, CA", time: "2025-10-21 06:40" },
+      { carrier: "UPS", trackingNumber: "1Z3F0BB10123456789", status: "In transit", location: "Concord, ON, CA", time: "2025-10-27 11:05" },
     ],
   },
   {
@@ -129,10 +129,10 @@ const sampleOrders = [
     total: initialProducts[4].price,
     items: [{ ...initialProducts[4], qty: 1 }],
     trackingEvents: [
-      { carrier: "FedEx", trackingNumber: "6123LENOVO789012", status: "Picked up", location: "Whitsett, NC, US", time: "2025-11-01 12:04" },
-      { carrier: "FedEx", trackingNumber: "6123LENOVO789012", status: "Arrived at FedEx location", location: "Memphis, TN, US", time: "2025-11-02 03:44" },
-      { carrier: "FedEx", trackingNumber: "6123LENOVO789012", status: "Departed FedEx location", location: "Memphis, TN, US", time: "2025-11-02 06:21" },
-      { carrier: "FedEx", trackingNumber: "6123LENOVO789012", status: "In transit", location: "Mississauga, ON, CA", time: "2025-11-06 09:57" },
+      { carrier: "FedEx", trackingNumber: "6123LENOVO789012", status: "Picked up", location: "Whitsett, NC, US", time: "2025-10-27 12:04" },
+      { carrier: "FedEx", trackingNumber: "6123LENOVO789012", status: "Arrived at FedEx location", location: "Memphis, TN, US", time: "2025-10-29 03:44" },
+      { carrier: "FedEx", trackingNumber: "6123LENOVO789012", status: "Departed FedEx location", location: "Memphis, TN, US", time: "2025-10-29 06:21" },
+      { carrier: "FedEx", trackingNumber: "6123LENOVO789012", status: "In transit", location: "Mississauga, ON, CA", time: "2025-10-31 09:57" },
     ],
   },
 ];
