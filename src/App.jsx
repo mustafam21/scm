@@ -207,7 +207,7 @@ function Footer() {
             <img src={LOGOS.stripe} alt="Stripe" className="h-6" />
             <span className="font-semibold">Consumers</span>
           </div>
-          <p className="text-slate-500">Consolidated order management and partner integrations.</p>
+          <p className="text-slate-500">Consolidated order management and partner integrations</p>
         </div>
         <div>
           <div className="font-semibold mb-2">Products</div>
@@ -308,7 +308,7 @@ function Home() {
         <div className="flex items-center justify-between gap-6 flex-wrap">
           <div>
             <h1 className="text-3xl font-semibold">Welcome{auth.user ? `, ${String(auth.user).split("@")[0]}` : ""}</h1>
-            <p className="text-slate-600 mt-2">Orders: consolidated order management across carriers and direct links to merchant pages.</p>
+            <p className="text-slate-600 mt-2">Consumer Dashboard: Access merchant integrations and order management</p>
           </div>
           <div className="flex items-center gap-3 text-sm">
             <div className="px-3 py-2 rounded-lg bg-slate-50">Users: <span className="font-semibold">{USERS_LIST.length}</span></div>
@@ -340,12 +340,12 @@ function Home() {
         <div className="lg:col-span-2 grid md:grid-cols-2 gap-6">
           <div className="p-6 border rounded-xl bg-white">
             <h3 className="font-semibold mb-2">Consumers (Orders)</h3>
-            <p className="text-sm text-slate-600 mb-4">See consolidated tracking across all shipping carriers.</p>
+            <p className="text-sm text-slate-600 mb-4">Manage Orders and Access Tracking Information</p>
             <Link to="/orders" className="inline-block bg-indigo-600 text-white px-4 py-2 rounded">Go to Orders</Link>
           </div>
           <div className="p-6 border rounded-xl bg-white">
             <h3 className="font-semibold mb-2">Merchants</h3>
-            <p className="text-sm text-slate-600 mb-4">Browse brand partners and jump to their sites.</p>
+            <p className="text-sm text-slate-600 mb-4">Browse brand partners and jump to their sites</p>
             <Link to="/merchants" className="inline-block bg-slate-700 text-white px-4 py-2 rounded">Go to Merchants</Link>
           </div>
         </div>
